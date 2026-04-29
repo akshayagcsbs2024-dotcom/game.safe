@@ -5,7 +5,7 @@ body{
   color:white;
   overflow:hidden;
 
-  background:linear-gradient(-45deg,#00c6ff,#0072ff,#ff416c,#ff4b2b);
+  background:linear-gradient(-45deg,#ff6a00,#ee0979,#00c6ff,#0072ff);
   background-size:400% 400%;
   animation:bg 8s infinite;
 }
@@ -17,27 +17,45 @@ body{
 }
 
 #start{margin-top:120px;}
-#game{display:none;margin-top:60px;}
+#game{display:none;margin-top:40px;}
 
-h2{font-size:28px;}
-#timer{color:yellow;}
-
-.btns{
+#items{
   display:flex;
+  flex-wrap:wrap;
   justify-content:center;
-  gap:20px;
+  gap:10px;
+  margin:20px;
+}
+
+.item{
+  padding:10px 15px;
+  background:white;
+  color:black;
+  border-radius:10px;
+  animation:pop 0.3s;
+}
+
+@keyframes pop{
+  from{transform:scale(0);}
+  to{transform:scale(1);}
+}
+
+#options{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:15px;
+  max-width:400px;
+  margin:auto;
 }
 
 button{
-  padding:15px 25px;
+  padding:12px;
   border:none;
-  border-radius:30px;
-  font-size:18px;
+  border-radius:20px;
+  background:#ff4e91;
+  color:white;
   cursor:pointer;
 }
-
-.safe{background:#00c853;}
-.risk{background:#d50000;}
 
 #shareBtn{display:none;margin-top:20px;}
 
