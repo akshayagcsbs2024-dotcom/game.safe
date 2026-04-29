@@ -1,104 +1,100 @@
-const questions=[
-"Start strong…",
-"Feeling lucky?",
-"Risk now?",
-"Big chance ahead",
-"Careful or crazy?",
-"Halfway…",
-"Trap coming 👀",
-"Multiplier round 🔥",
-"Jackpot chance 💎",
-"Final move 😈"
-];
+const pool=["Apple","Car","Dog","Phone","Book","Pizza","Chair","Watch","Pen","Bottle","Bag","Mouse","Keyboard"];
 
-let i=0,score=0,time=5,timer;
+let score=0, round=0, items=[], timer;
 
 function startGame(){
   document.getElementById("start").style.display="none";
   document.getElementById("game").style.display="block";
-  next();
+  nextRound();
 }
 
-function next(){
-  if(i>=questions.length){endGame();return;}
+function nextRound(){
+  round++;
+  if(round>5){endGame();return;}
 
-  document.getElementById("question").innerText=questions[i];
   document.getElementById("result").innerText="";
+  document.getElementById("options").innerHTML="";
 
-  startTimer();
+  let count = round<=2 ? 5 : round<=4 ? 7 : 9;
+
+  document.getElementById("level").innerText="Level "+round+" ("+count+" items)";
+
+  items = pool.sort(()=>0.5-Math.random()).slice(0,count);
+
+  showItems(count);
 }
 
-function startTimer(){
-  time=5;
-  document.getElementById("timer").innerText="Time: "+time;
+function showItems(count){
+  const box=document.getElementById("items");
+  box.innerHTML="";
 
+  items.forEach(it=>{
+    box.innerHTML+=`<div class="item">${it}</div>`;
+  });
+
+  startTimer(4);
+}
+
+function startTimer(t){
+  document.getElementById("timer").innerText="Memorize: "+t;
   timer=setInterval(()=>{
-    time--;
-    document.getElementById("timer").innerText="Time: "+time;
+    t--;
+    document.getElementById("timer").innerText="Memorize: "+t;
 
-    if(time<=0){
+    if(t<=0){
       clearInterval(timer);
-      i++;
-      next();
+      hideItems();
     }
   },1000);
 }
 
-function choose(type){
-  clearInterval(timer);
+function hideItems(){
+  document.getElementById("items").innerHTML="❓ ❓ ❓ ❓ ❓";
 
-  let change=0;
+  let correct = items[Math.floor(Math.random()*items.length)];
 
-  // 💣 TRAP ROUND
-  if(i===6){
-    change=-3;
-    document.getElementById("result").innerText="💣 Trap! -3";
+  let opts=[correct];
+
+  while(opts.length<4){
+    let r=pool[Math.floor(Math.random()*pool.length)];
+    if(!opts.includes(r)) opts.push(r);
   }
 
-  // 🎯 MULTIPLIER
-  else if(i===7){
-    change=(Math.floor(Math.random()*3)+1)*2;
-    document.getElementById("result").innerText="🔥 x2 Round +"+change;
-  }
+  opts.sort(()=>0.5-Math.random());
 
-  // 💎 JACKPOT
-  else if(i===8){
-    change=Math.floor(Math.random()*10)+5;
-    document.getElementById("result").innerText="💎 JACKPOT +"+change;
-    blast(200);
+  opts.forEach(o=>{
+    document.getElementById("options").innerHTML+=
+      `<button onclick="check('${o}','${correct}')">${o}</button>`;
+  });
+}
+
+function check(c,ans){
+  if(c===ans){
+    score++;
+    document.getElementById("result").innerText="Correct 🧠";
+    blast(80);
     playSound();
+  }else{
+    document.getElementById("result").innerText="Wrong 😂 ("+ans+")";
   }
 
-  else{
-    if(type==="safe"){
-      change=Math.floor(Math.random()*2)+1;
-      document.getElementById("result").innerText="Safe +"+change;
-    }else{
-      change=Math.floor(Math.random()*6)-2;
-      document.getElementById("result").innerText="Risk "+change;
-      blast(100);
-      playSound();
-    }
-  }
-
-  score+=change;
-  i++;
-  setTimeout(next,800);
+  setTimeout(nextRound,1000);
 }
 
 function endGame(){
   let msg="";
-  if(score>=20)msg="Legend 🔥";
-  else if(score>=10)msg="Pro 😎";
-  else msg="Noob 😭";
+  if(score>=4)msg="Memory Master 🧠🔥";
+  else if(score>=2)msg="Average 😎";
+  else msg="Forgetful 😂";
 
-  document.getElementById("question").innerText="Game Over!";
-  document.querySelector(".btns").style.display="none";
+  document.getElementById("items").innerHTML="";
+  document.getElementById("options").innerHTML="";
+  document.getElementById("level").innerText="Game Over!";
   document.getElementById("result").innerText=msg;
-  document.getElementById("score").innerText="Score: "+score;
+  document.getElementById("score").innerText="Score: "+score+"/5";
   document.getElementById("shareBtn").style.display="block";
 
-  blast(300);
+  blast(200);
   playSound();
 }
 
@@ -111,9 +107,9 @@ function playSound(){
 
 /* SHARE */
 function shareScore(){
-  const text=`I scored ${score} in PRO Risk Game 🔥 Try: ${location.href}`;
+  const text=`I scored ${score}/5 in Memory PRO 🧠🔥 Try: ${location.href}`;
   if(navigator.share){
-    navigator.share({title:"Risk PRO",text,url:location.href});
+    navigator.share({title:"Memory PRO",text,url:location.href});
   }else{
     navigator.clipboard.writeText(text);
     alert("Copied 😎");
@@ -129,13 +125,13 @@ c.height=innerHeight;
 let p=[];
 
 function blast(n){
-  for(let j=0;j<n;j++){
+  for(let i=0;i<n;i++){
     p.push({
       x:c.width/2,
       y:c.height/2,
       s:Math.random()*5+2,
-      vx:(Math.random()-0.5)*12,
-      vy:(Math.random()-0.5)*12,
+      vx:(Math.random()-0.5)*10,
+      vy:(Math.random()-0.5)*10,
       col:`hsl(${Math.random()*360},100%,50%)`
     });
   }
